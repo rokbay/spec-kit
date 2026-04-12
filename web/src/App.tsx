@@ -16,21 +16,21 @@ export default function App() {
       name: "Fit 1",
       price: 180,
       description: "Heavyweight French Terry in Sage",
-      image: "input_file_0.png"
+      image: "/images/fit-1.jpeg"
     },
     {
       id: 2,
       name: "Fit 2",
       price: 180,
       description: "Brushed Cotton Fleece in Bone",
-      image: "input_file_1.png"
+      image: "/images/fit-2.jpeg"
     },
     {
       id: 3,
       name: "Fit 3",
       price: 180,
       description: "Premium Oversized Fit in Carbon",
-      image: "input_file_2.png"
+      image: "/images/fit-3.jpeg"
     }
   ];
 
@@ -63,7 +63,7 @@ export default function App() {
             <img 
               alt="Quail Studio Hero" 
               className="w-full h-full object-cover" 
-              src="input_file_2.png"
+              src="/images/fit-3.jpeg"
               referrerPolicy="no-referrer"
             />
             <div className="absolute inset-0 bg-black/40"></div>
@@ -132,6 +132,11 @@ export default function App() {
                         src={product.image}
                         referrerPolicy="no-referrer"
                       />
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10" style={{ mixBlendMode: 'overlay' }}>
+                        <div className="text-white opacity-40 font-headline italic text-3xl md:text-4xl -rotate-45 select-none tracking-widest whitespace-nowrap drop-shadow-md">
+                          Quail Studio
+                        </div>
+                      </div>
                     </div>
                     <div className="p-6 flex flex-col flex-grow">
                       <div className="flex justify-between items-start mb-2">
