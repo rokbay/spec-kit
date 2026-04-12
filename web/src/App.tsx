@@ -9,6 +9,13 @@ import { motion, AnimatePresence } from 'motion/react';
 
 export default function App() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
+
+  const handleWhatsAppOrder = (e: React.FormEvent) => {
+    e.preventDefault();
+    const text = `Order Inquiry\nName: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}`;
+    window.open('https://wa.me/201009891255?text=' + encodeURIComponent(text), '_blank');
+  };
   const carouselRef = useRef<HTMLDivElement>(null);
   const products = [
     {
@@ -182,34 +189,26 @@ export default function App() {
                 <p className="text-xl text-white/80 font-light leading-relaxed">
                   Complete your order details below. Each piece is packaged with sustainable materials and carbon-neutral shipping.
                 </p>
-                <ul className="space-y-4">
-                  <li className="flex items-center gap-4 text-lg">
-                    <Truck className="text-white/60" size={24} />
-                    Worldwide Express Delivery
-                  </li>
-                  <li className="flex items-center gap-4 text-lg">
-                    <ShieldCheck className="text-white/60" size={24} />
-                    Authenticity Certificate Included
-                  </li>
-                  <li className="flex items-center gap-4 text-lg">
-                    <Sparkles className="text-white/60" size={24} />
-                    30-Day Aesthetic Guarantee
-                  </li>
-                </ul>
+                <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm border border-white/10">
+                  <h3 className="font-headline text-2xl mb-4 italic">Exclusive Delivery within Egypt</h3>
+                  <p className="text-white/80 leading-relaxed">
+                    As a growing local independent studio, we meticulously craft each piece. We offer standard domestic shipping across Egypt. Exchanges are happily accepted within 14 days if the garment remains in its pristine, tactile condition.
+                  </p>
+                </div>
               </div>
               <div className="bg-surface p-10 rounded-xl shadow-2xl text-on-surface">
-                <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+                <form className="space-y-6" onSubmit={handleWhatsAppOrder}>
                   <div className="space-y-2">
                     <label className="text-sm font-semibold tracking-widest text-secondary uppercase">Full Name</label>
-                    <input className="w-full px-6 py-4 rounded-md bg-surface-container-highest border-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 transition-all text-on-surface outline-none placeholder:text-stone-400" placeholder="Julianne Smith" type="text"/>
+                    <input required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-6 py-4 rounded-md bg-surface-container-highest border-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 transition-all text-on-surface outline-none placeholder:text-stone-400" placeholder="Julianne Smith" type="text"/>
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-semibold tracking-widest text-secondary uppercase">Email Address</label>
-                    <input className="w-full px-6 py-4 rounded-md bg-surface-container-highest border-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 transition-all text-on-surface outline-none placeholder:text-stone-400" placeholder="julie@quail.studio" type="email"/>
+                    <input required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full px-6 py-4 rounded-md bg-surface-container-highest border-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 transition-all text-on-surface outline-none placeholder:text-stone-400" placeholder="julie@quail.studio" type="email"/>
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-semibold tracking-widest text-secondary uppercase">Phone Number</label>
-                    <input className="w-full px-6 py-4 rounded-md bg-surface-container-highest border-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 transition-all text-on-surface outline-none placeholder:text-stone-400" placeholder="+1 (555) 000-0000" type="tel"/>
+                    <input required value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full px-6 py-4 rounded-md bg-surface-container-highest border-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 transition-all text-on-surface outline-none placeholder:text-stone-400" placeholder="+20 10 0000 0000" type="tel"/>
                   </div>
                   <button className="w-full group relative overflow-hidden bg-primary text-white py-5 rounded-full font-bold text-lg glossy-finish active:scale-95 transition-all flex items-center justify-center gap-3" type="submit">
                     <span className="relative z-10">Place Order</span>
@@ -226,6 +225,22 @@ export default function App() {
         </section>
       </main>
 
+      {/* About Section */}
+      <section id="about" className="py-24 px-8 max-w-4xl mx-auto text-center space-y-8">
+        <h2 className="font-headline text-5xl text-primary italic">About the Founder</h2>
+        <div className="font-body text-xl text-stone-600 leading-relaxed font-light space-y-6 text-left border-l-4 border-primary/20 pl-8">
+          <p>
+            In a world of fast fashion and mass production, I craved garments that felt deeply personal—pieces that live, breathe, and age beautifully with the wearer.
+          </p>
+          <p>
+            I’m <strong className="text-primary font-semibold font-headline">اسمهان</strong> (Asmahan), and Quail Studio was born out of my obsession with tactility, true comfort, and the raw beauty of minimalist silhouettes. Every piece here is a reflection of authentic craftsmanship blended with a modern aesthetic.
+          </p>
+          <p className="italic text-2xl text-primary font-headline mt-8">
+            We don't just make clothes; we curate a feeling.
+          </p>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="bg-stone-100 py-12 px-8 flex flex-col md:flex-row justify-between items-center gap-8 w-full font-label text-sm tracking-tight">
         <div className="flex flex-col items-center md:items-start gap-4">
@@ -234,9 +249,6 @@ export default function App() {
         </div>
         <div className="flex gap-8">
           <a className="text-stone-600 hover:text-primary transition-colors" href="#">Instagram</a>
-          <a className="text-stone-600 hover:text-primary transition-colors" href="#">Pinterest</a>
-          <a className="text-stone-600 hover:text-primary transition-colors" href="#">Shipping Policy</a>
-          <a className="text-stone-600 hover:text-primary transition-colors" href="#">Contact Support</a>
         </div>
       </footer>
 
