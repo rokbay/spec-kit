@@ -4,16 +4,39 @@
  */
 
 import { useState, useRef, useEffect } from 'react';
-import { ShoppingBag, Menu, Truck, ShieldCheck, Sparkles, ArrowRight, Home, Search, Heart, User, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ShoppingBag, Menu, ArrowRight, Home, Search, Heart, User, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function App() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', honeypot: '' });
+  const [checkoutFit, setCheckoutFit] = useState<string | null>(null);
+  const [formError, setFormError] = useState('');
 
   const handleWhatsAppOrder = (e: React.FormEvent) => {
     e.preventDefault();
-    const text = `Order Inquiry\nName: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}`;
+    if (formData.honeypot) return; // Anti-spam trap
+
+    const sanitize = (str: string) => str.replace(/[<>]/g, '');
+    const safeName = sanitize(formData.name).trim();
+    const safeEmail = sanitize(formData.email).trim();
+    const safePhone = sanitize(formData.phone).trim();
+
+    if (!/^[a-zA-Z\s]+$/.test(safeName)) {
+      setFormError('Name must contain only letters to prevent injection.');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(safeEmail)) {
+      setFormError('Please enter a valid email.');
+      return;
+    }
+    if (!/^[\d\+\-\s]{8,}$/.test(safePhone)) {
+      setFormError('Please enter a valid phone number.');
+      return;
+    }
+
+    setFormError('');
+    const text = `Order Inquiry\nFit: ${checkoutFit}\nName: ${safeName}\nEmail: ${safeEmail}\nPhone: ${safePhone}`;
     window.open('https://wa.me/201009891255?text=' + encodeURIComponent(text), '_blank');
   };
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -132,7 +155,10 @@ export default function App() {
                     key={product.id}
                     className="min-w-full md:min-w-[calc(50%-1rem)] lg:min-w-[calc(33.333%-1.333rem)] bg-surface-container-low rounded-lg overflow-hidden group/card flex flex-col h-full shadow-sm hover:shadow-md transition-all"
                   >
-                    <div className="aspect-[4/5] relative overflow-hidden bg-surface-container">
+                    <div 
+                      className="aspect-[4/5] relative overflow-hidden bg-surface-container cursor-pointer"
+                      onClick={() => setCheckoutFit(product.name)}
+                    >
                       <img 
                         alt={product.name} 
                         className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105" 
@@ -152,8 +178,11 @@ export default function App() {
                       </div>
                       <p className="text-on-surface-variant font-body text-sm">{product.description}</p>
                       <div className="mt-auto pt-4">
-                        <button className="w-full py-2 border border-primary/20 text-primary text-sm font-semibold rounded-full hover:bg-primary hover:text-white transition-colors">
-                          View Details
+                        <button 
+                          onClick={() => setCheckoutFit(product.name)}
+                          className="w-full py-2 border border-primary/20 text-primary text-sm font-semibold rounded-full hover:bg-primary hover:text-white transition-colors"
+                        >
+                          Order This Fit
                         </button>
                       </div>
                     </div>
@@ -178,51 +207,6 @@ export default function App() {
           </div>
         </section>
 
-        {/* Order Section */}
-        <section className="bg-secondary text-white py-32 px-8 overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -mr-48 -mt-48"></div>
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-2xl -ml-32 -mb-32"></div>
-          <div className="max-w-5xl mx-auto relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-              <div className="space-y-8">
-                <h2 className="font-headline text-6xl leading-tight">Bring the Studio Home</h2>
-                <p className="text-xl text-white/80 font-light leading-relaxed">
-                  Complete your order details below. Each piece is packaged with sustainable materials and carbon-neutral shipping.
-                </p>
-                <div className="bg-white/10 p-6 rounded-lg backdrop-blur-sm border border-white/10">
-                  <h3 className="font-headline text-2xl mb-4 italic">Exclusive Delivery within Egypt</h3>
-                  <p className="text-white/80 leading-relaxed">
-                    As a growing local independent studio, we meticulously craft each piece. We offer standard domestic shipping across Egypt. Exchanges are happily accepted within 14 days if the garment remains in its pristine, tactile condition.
-                  </p>
-                </div>
-              </div>
-              <div className="bg-surface p-10 rounded-xl shadow-2xl text-on-surface">
-                <form className="space-y-6" onSubmit={handleWhatsAppOrder}>
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold tracking-widest text-secondary uppercase">Full Name</label>
-                    <input required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-6 py-4 rounded-md bg-surface-container-highest border-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 transition-all text-on-surface outline-none placeholder:text-stone-400" placeholder="Julianne Smith" type="text"/>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold tracking-widest text-secondary uppercase">Email Address</label>
-                    <input required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full px-6 py-4 rounded-md bg-surface-container-highest border-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 transition-all text-on-surface outline-none placeholder:text-stone-400" placeholder="julie@quail.studio" type="email"/>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold tracking-widest text-secondary uppercase">Phone Number</label>
-                    <input required value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full px-6 py-4 rounded-md bg-surface-container-highest border-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 transition-all text-on-surface outline-none placeholder:text-stone-400" placeholder="+20 10 0000 0000" type="tel"/>
-                  </div>
-                  <button className="w-full group relative overflow-hidden bg-primary text-white py-5 rounded-full font-bold text-lg glossy-finish active:scale-95 transition-all flex items-center justify-center gap-3" type="submit">
-                    <span className="relative z-10">Place Order</span>
-                    <ArrowRight className="relative z-10 group-hover:translate-x-2 transition-transform" size={24} />
-                    <div className="absolute inset-0 bg-orange-800 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                  </button>
-                  <p className="text-center text-sm text-stone-500 italic mt-4">
-                    You will be redirected to WhatsApp to confirm your bespoke selection.
-                  </p>
-                </form>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
 
       {/* About Section */}
@@ -248,7 +232,7 @@ export default function App() {
           <p className="text-stone-600 text-center md:text-left">© 2024 The Quail Studio Experience. Hand-crafted in the studio.</p>
         </div>
         <div className="flex gap-8">
-          <a className="text-stone-600 hover:text-primary transition-colors" href="#">Instagram</a>
+          <a className="text-stone-600 hover:text-primary transition-colors" href="https://www.instagram.com/quail_essentials?igsh=MTRobjd0M3dpNXN1cg%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram</a>
         </div>
       </footer>
 
@@ -261,6 +245,69 @@ export default function App() {
           <a className="text-stone-400" href="#"><User size={20} /></a>
         </div>
       </div>
+
+      {/* Slide-Up Checkout Modal */}
+      <AnimatePresence>
+        {checkoutFit && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex flex-col justify-end sm:justify-center items-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm"
+            onClick={() => setCheckoutFit(null)}
+          >
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="bg-surface w-full max-w-2xl sm:rounded-2xl rounded-t-3xl shadow-2xl overflow-hidden relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button 
+                onClick={() => setCheckoutFit(null)} 
+                className="absolute top-6 right-6 text-white hover:text-stone-200 transition-colors z-10"
+              >
+                <X size={28} />
+              </button>
+              
+              <div className="bg-secondary text-white p-8 sm:p-12 pb-16 sm:pb-12 bg-gradient-to-t from-secondary to-[#6a3f00]">
+                <h2 className="font-headline text-4xl sm:text-5xl italic leading-tight mb-2">Configure {checkoutFit}</h2>
+                <p className="text-white/80 font-light text-lg mb-8">Exclusive Delivery within Egypt. Lock in your piece before it's gone.</p>
+                
+                {formError && (
+                  <div className="mb-6 p-4 rounded-md bg-red-900/40 text-red-100 border border-red-500/50 backdrop-blur-md">
+                    {formError}
+                  </div>
+                )}
+
+                <form className="space-y-6" onSubmit={handleWhatsAppOrder}>
+                  {/* Honeypot for Anti-Spam */}
+                  <input type="text" name="hp_name" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" value={formData.honeypot} onChange={e => setFormData({...formData, honeypot: e.target.value})} />
+                  
+                  <div>
+                    <label className="text-xs font-semibold tracking-widest uppercase block mb-2 text-white/50">Full Name</label>
+                    <input required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-5 py-4 rounded-md bg-white/10 border border-white/20 focus:bg-white/20 focus:ring-2 focus:ring-white/30 transition-all text-white outline-none placeholder:text-white/30" placeholder="Julianne Smith" type="text"/>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold tracking-widest uppercase block mb-2 text-white/50">Email Address</label>
+                    <input required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full px-5 py-4 rounded-md bg-white/10 border border-white/20 focus:bg-white/20 focus:ring-2 focus:ring-white/30 transition-all text-white outline-none placeholder:text-white/30" placeholder="julie@quail.studio" type="email"/>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold tracking-widest uppercase block mb-2 text-white/50">Phone Number</label>
+                    <input required value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full px-5 py-4 rounded-md bg-white/10 border border-white/20 focus:bg-white/20 focus:ring-2 focus:ring-white/30 transition-all text-white outline-none placeholder:text-white/30" placeholder="+20 10 0000 0000" type="tel"/>
+                  </div>
+                  <button className="w-full mt-4 group relative overflow-hidden bg-primary text-white py-5 rounded-full font-bold text-lg glossy-finish active:scale-95 transition-all flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(146,70,41,0.4)]" type="submit">
+                    <span className="relative z-10">Confirm via WhatsApp</span>
+                    <ArrowRight className="relative z-10 group-hover:translate-x-2 transition-transform" size={24} />
+                    <div className="absolute inset-0 bg-stone-900 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                  </button>
+                </form>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
