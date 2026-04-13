@@ -13,6 +13,13 @@ export default function App() {
   const [checkoutFit, setCheckoutFit] = useState<string | null>(null);
   const [formError, setFormError] = useState('');
   
+  const handleFitSelection = (fitName: string) => {
+    setCheckoutFit(fitName);
+    setTimeout(() => {
+      document.getElementById('checkout-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 150); // wait for Framer Motion to expand the container
+  };
+  
   // Sizing Studio
   const [userHeight, setUserHeight] = useState(180);
 
@@ -178,7 +185,7 @@ export default function App() {
                   >
                     <div 
                       className="aspect-[4/5] relative overflow-hidden bg-surface-container cursor-pointer"
-                      onClick={() => setCheckoutFit(product.name)}
+                      onClick={() => handleFitSelection(product.name)}
                     >
                       <img 
                         alt={product.name} 
@@ -198,7 +205,7 @@ export default function App() {
                       <p className="text-on-surface-variant font-body text-sm text-center mb-6">{product.description}</p>
                       
                       <button 
-                        onClick={() => setCheckoutFit(product.name)}
+                        onClick={() => handleFitSelection(product.name)}
                         className={`w-full py-3 text-sm font-bold uppercase tracking-wider rounded-full transition-all ${isCenter ? 'bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary/90' : 'border border-primary/20 text-primary hover:bg-primary/10'}`}
                       >
                         Order This Fit
@@ -228,6 +235,7 @@ export default function App() {
           <AnimatePresence>
             {checkoutFit && (
               <motion.div
+                id="checkout-section"
                 initial={{ height: 0, opacity: 0, marginTop: 0 }}
                 animate={{ height: 'auto', opacity: 1, marginTop: 48 }}
                 exit={{ height: 0, opacity: 0, marginTop: 0 }}
