@@ -4,7 +4,7 @@
  */
 
 import { useState, useRef, useEffect } from 'react';
-import { ShoppingBag, Menu, ArrowRight, Home, Search, Heart, User, X } from 'lucide-react';
+import { ShoppingBag, Menu, ArrowRight, Home, Search, Heart, User, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function App() {
@@ -208,23 +208,19 @@ export default function App() {
                 );
               })}
             </AnimatePresence>
-          </div>
 
-          {/* Custom Side Arrows */}
-          <div className="flex justify-center items-center gap-16 mt-8">
+            {/* Custom Side Arrows */}
             <button 
-              onClick={prevSlide} 
-              disabled={currentIndex === 0}
-              className={`font-headline italic text-3xl text-primary transition-opacity ${currentIndex === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:opacity-70'}`}
+              onClick={prevSlide}
+              className={`absolute left-0 md:-left-12 top-1/2 -translate-y-1/2 z-50 p-4 rounded-full bg-white/90 shadow-xl border border-stone-200 text-primary transition-all hover:bg-white hover:scale-105 active:scale-95 ${currentIndex === 0 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
             >
-              &lt;---
+              <ChevronLeft size={28} strokeWidth={2} />
             </button>
             <button 
-              onClick={nextSlide} 
-              disabled={currentIndex === products.length - 1}
-              className={`font-headline italic text-3xl text-primary transition-opacity ${currentIndex === products.length - 1 ? 'opacity-30 cursor-not-allowed' : 'hover:opacity-70'}`}
+              onClick={nextSlide}
+              className={`absolute right-0 md:-right-12 top-1/2 -translate-y-1/2 z-50 p-4 rounded-full bg-white/90 shadow-xl border border-stone-200 text-primary transition-all hover:bg-white hover:scale-105 active:scale-95 ${currentIndex === products.length - 1 ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
             >
-              ---&gt;
+              <ChevronRight size={28} strokeWidth={2} />
             </button>
           </div>
 
