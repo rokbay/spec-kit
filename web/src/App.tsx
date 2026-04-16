@@ -4,7 +4,7 @@
  */
 
 import { useState, useRef, useEffect } from 'react';
-import { ShoppingBag, Menu, ArrowRight, Home, Search, Heart, User, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Instagram, Menu, ArrowRight, Home, Search, Heart, User, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function App() {
@@ -95,9 +95,9 @@ export default function App() {
           <a className="text-stone-500 hover:text-primary transition-colors" href="#about">About</a>
         </div>
         <div className="flex items-center gap-4">
-          <button className="text-primary hover:opacity-80 transition-opacity p-2 active:scale-95">
-            <ShoppingBag size={24} />
-          </button>
+          <a className="text-primary hover:opacity-80 transition-opacity p-2 animate-shake" href="https://www.instagram.com/quail_essentials?igsh=MTRobjd0M3dpNXN1cg%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">
+            <Instagram size={24} />
+          </a>
           <button className="md:hidden text-primary">
             <Menu size={24} />
           </button>
@@ -116,14 +116,19 @@ export default function App() {
             />
             <div className="absolute inset-0 bg-black/40"></div>
           </div>
-          <div className="relative z-10 text-center max-w-4xl space-y-6">
+          <div className="relative z-10 text-center w-full max-w-full overflow-hidden space-y-6">
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="font-headline italic text-7xl md:text-9xl text-white tracking-tight leading-none drop-shadow-lg"
+              className="font-headline italic text-7xl md:text-9xl text-white tracking-tight leading-none drop-shadow-lg w-full flex overflow-hidden whitespace-nowrap"
             >
-              The Tactile Studio
+              <div className="animate-marquee flex gap-16 whitespace-nowrap shrink-0">
+                <span>The Tactile Studio</span>
+                <span>The Tactile Studio</span>
+                <span>The Tactile Studio</span>
+                <span>The Tactile Studio</span>
+              </div>
             </motion.h1>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -386,9 +391,6 @@ export default function App() {
         <div className="flex flex-col items-center md:items-start gap-4">
           <div className="font-headline text-lg italic text-primary">Quail Studio</div>
           <p className="text-stone-600 text-center md:text-left">© 2024 The Quail Studio Experience. Hand-crafted in little details.</p>
-        </div>
-        <div className="flex gap-8">
-          <a className="text-stone-600 hover:text-primary transition-colors" href="https://www.instagram.com/quail_essentials?igsh=MTRobjd0M3dpNXN1cg%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram</a>
         </div>
       </footer>
 
