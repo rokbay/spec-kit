@@ -1,20 +1,57 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# FinAtelier Egypt — Architectural Fintech
 
-# Run and deploy your AI Studio app
+A high-performance installment-payment landing page tailored for the Egyptian market. Built with modern web standards, focusing on silhouette, speed, and conversion security.
 
-This contains everything you need to run your app locally.
+## 🚀 Quick Start
 
-View your app in AI Studio: https://ai.studio/apps/2d3ea8f7-8c97-4741-b505-e6ce9bec155f
+### Prerequisites
+- Node.js (v18+)
+- npm
 
-## Run Locally
+### Installation
+```bash
+# Navigate to project directory
+cd web2/finatelier
 
-**Prerequisites:**  Node.js
+# Install dependencies
+npm install
 
+# Start development server
+npm run dev
+```
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## 🛠 Tech Stack
+- **Framework:** React 19 + Vite 6
+- **Styling:** Tailwind CSS 4 (Custom design tokens in `index.css`)
+- **Animations:** Framer Motion (Optimized for bento-grid transitions)
+- **Icons:** Lucide React
+
+## 🎯 Configuration & Customization
+
+This project is built to be easily adjusted for production use.
+
+### 📱 WhatsApp Routing
+All application forms and CTA buttons route to WhatsApp. To change the target number:
+1. Open `src/App.tsx`.
+2. Locate the `handleSubmit` function.
+3. Replace the placeholder number `201XXXXXXXXX` with your production business number (format: country code without `+` followed by the mobile number).
+
+### 🎨 Branding & Theme
+Design tokens are centralized in `src/index.css` under the `@theme` block. You can quickly swap:
+- `--color-primary` (Deep blacks/grays)
+- `--color-secondary` (Brand accent blue/gold)
+- `--font-headline` & `--font-body` (Google Fonts integration)
+
+### 📂 Key Components
+- **`Navbar`**: Responsive navigation with stateful mobile drawer.
+- **`ApplicationForm`**: Security-hardened lead capture with honeypot spam protection and localized Egyptian regex validation.
+- **`Collection`**: Dynamic product grid with EGP currency formatting.
+
+## 🔒 Security Features
+- **Input Sanitization:** Regex enforcement for Unicode names and Egyptian mobile formats.
+- **Bot Protection:** Hidden honeypot field included in all form submissions.
+- **Rate Limiting:** 60-second client-side cooldown implemented on the primary CTA to prevent automated spam.
+- **Content Security Policy:** Strict CSP meta tags pre-configured in `index.html`.
+
+## 📄 License
+© 2025 FinAtelier Egypt. All rights reserved.
