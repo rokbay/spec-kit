@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-headline: "Inter", sans-serif;
+  --font-body: "Inter", sans-serif;
+  
+  --color-primary: #1a1c21;
+  --color-primary-container: #2d5bff;
+  --color-secondary: #2d5bff;
+  --color-secondary-container: #eef2ff;
+  --color-background: #f5f7fa;
+  --color-surface: #ffffff;
+  --color-surface-container-low: #f1f5f9;
+  --color-surface-container-high: #e2e8f0;
+  --color-surface-container-highest: #cbd5e1;
+  --color-surface-container-lowest: #ffffff;
+  --color-on-surface: #1a1c21;
+  --color-on-surface-variant: #64748b;
+  --color-outline: #e2e8f0;
+  --color-outline-variant: #e2e8f0;
+  --color-accent-blue: #2d5bff;
+}
+
+@layer utilities {
+  .text-glass-blue {
+    background: linear-gradient(135deg, #2d5bff 0%, #1738b5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .bg-hero-gradient {
+    background: linear-gradient(135deg, #2D5BFF 0%, #1738B5 100%);
+  }
+
+  .shadow-bento {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  }
+  
+  .border-bento {
+    border: 1px solid var(--color-outline);
+  }
+}
+
+body {
+  @apply bg-background font-body text-on-surface selection:bg-secondary-container selection:text-secondary;
+}
+
+h1, h2, h3, h4 {
+  @apply font-headline;
+}
