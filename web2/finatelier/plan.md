@@ -1,90 +1,135 @@
-# Plan: Finatelier Production Readiness Cleanup
+# Plan: Finatelier v2 — Production Quality, Market Fit & Security
 
-## Summary
-Structured implementation plan derived from `spec.md`. Work is sequenced to minimize risk: deletions first, then copy edits, then image replacements, then link cleanup, then import hygiene.
-
----
-
-## Phase 1 — Delete the Testimonials Component (REQ-01)
-
-### Step 1.1 — Remove the component definition
-Delete lines 387–452 (`const Testimonials = ...`) from `web2/finatelier/src/App.tsx`.
-
-### Step 1.2 — Remove the component call
-Delete `<Testimonials />` from the `App()` return block.
-
-**Risk:** None. Pure deletion.
+## Sequencing Rationale
+Security changes (REQ-06) touch the form component, which overlaps with REQ-01. These must be implemented together in a single atomic pass on `ApplicationForm` to avoid merge conflicts. All other REQs are independent.
 
 ---
 
-## Phase 2 — Neutralize Unsubstantiated Claims (REQ-02)
+## Phase 1 — Application Form: Functional + Secure (REQ-01 + REQ-06)
 
-### Step 2.1 — "30-Sec Approval" → "Fast Approval"
-In `Benefits`, Bento Card 3: change `h3` from `"30-Sec Approval"` to `"Fast Approval"` and update the `p` to `"Our decisioning engine gets you shopping quickly."`.
+**File:** `web2/finatelier/src/App.tsx` — `ApplicationForm` component
 
-### Step 2.2 — "99% Security" stat
-In `Benefits`, Bento Card 5: remove the `99%` and `Security` pair entirely. Replace the two-column stat layout with a single clean label: `"Bank-grade Security"`.
-
-### Step 2.3 — "24/7 Support" stat
-In the same bento card: change `24/7` label to `"Dedicated Support"` or remove the stat entirely if layout allows without orphan dividers.
-
-**Risk:** Low. Text-only edits. Must verify the vertical divider renders correctly after removing a stat column.
-
----
-
-## Phase 3 — Replace External Images (REQ-03)
-
-### Step 3.1 — Process section hero image
-Replace the `<img>` tag on line ~225 (the home-setup image in `Process`) with a styled placeholder `<div>`:
-```jsx
-<div className="w-full h-[500px] rounded-[24px] bg-surface-container-high flex items-center justify-center text-on-surface-variant text-sm tracking-widest uppercase font-bold">
-  [Photo Coming Soon]
-</div>
+### Step 1.1 — Add form state
+```
+const [fullName, setFullName] = useState('');
+const [phone, setPhone] = useState('');
+const [productInterest, setProductInterest] = useState('Electronics');
+const [honeypot, setHoneypot] = useState('');
+const [formError, setFormError] = useState('');
+const [cooldown, setCooldown] = useState(0);
 ```
 
-### Step 3.2 — Collection product images
-Replace each of the 3 `<img>` tags inside the `Collection` grid with styled placeholder `<div>` blocks using distinct background tones (e.g., `bg-stone-100`, `bg-stone-200`, `bg-stone-300`) to preserve visual hierarchy.
+### Step 1.2 — Validation function
+Implement `validateForm()` which:
+- Tests `fullName` against `/^[\p{L}\s]{2,60}$/u` (Unicode letters + spaces only, 2–60 chars)
+- Tests `phone` against `/^(\+20|0)(10|11|12|15)[0-9]{8}$/` (Egyptian mobile numbers only)
+- Confirms `productInterest` is one of the allowed enum values
+- Returns `null` on success or an error string on failure
 
-**Risk:** Low. No functional or layout impact. The aspect-ratio wrapper `aspect-[4/5]` remains.
-
----
-
-## Phase 4 — Footer Dead Link Cleanup (REQ-04)
-
-### Step 4.1 — Remove dead link columns
-From the `Footer` grid, remove the full column objects for: `Legal`, `Company`, `Support`. Retain only the `Platform` column with anchors to `#benefits` and `#process`.
-
-### Step 4.2 — Add legal placeholder line
-Below the remaining footer nav, add a single `<p>` line:
-```jsx
-<p className="text-[10px] text-on-surface-variant">Terms & Privacy — Coming Soon</p>
+### Step 1.3 — Submit handler
+```
+handleSubmit(e):
+  e.preventDefault()
+  if honeypot has value → return silently
+  if cooldown > 0 → return
+  errors = validateForm()
+  if errors → setFormError(errors); return
+  text = encodeURIComponent(`FinAtelier Inquiry\nName: ${fullName}\nPhone: ${phone}\nProduct: ${productInterest}`)
+  window.open(`https://wa.me/[BUSINESS_NUMBER]?text=${text}`, '_blank')
+  setCooldown(60)  // start 60-second rate limit
 ```
 
-### Step 4.3 — Remove Globe & Languages icons
-Remove the `<Globe />` and `<Languages />` icon buttons from the footer bottom bar since they have no real functionality.
+### Step 1.4 — Cooldown timer
+```
+useEffect:
+  if cooldown > 0:
+    const t = setTimeout(() => setCooldown(c => c - 1), 1000)
+    return () => clearTimeout(t)
+```
 
-**Risk:** Low. Visual simplification.
+### Step 1.5 — Honeypot field
+Add `<input type="text" name="website" style={{display:'none'}} tabIndex={-1} autoComplete="off" />` inside the form.
+
+### Step 1.6 — Legal disclosure line
+Add below submit button: `"By submitting, you consent to being contacted via WhatsApp by a FinAtelier representative."`
+
+### Step 1.7 — Wire WhatsApp button in left column
+The existing `<button>Chat on WhatsApp</button>` should become an `<a href="https://wa.me/[NUMBER]" target="_blank">` link.
 
 ---
 
-## Phase 5 — Import Hygiene (REQ-05)
+## Phase 2 — Mobile Navigation (REQ-02)
 
-### Step 5.1 — Audit and remove unused Lucide imports
-After all deletions, scan the import list for: `Quote`, `Globe`, `Languages`, `Monitor`, `CheckCircle2`, `MessageCircle` (if WhatsApp button uses text only).
-Remove any that are not referenced in the remaining JSX.
+**File:** `web2/finatelier/src/App.tsx` — `Navbar` component
 
-**Risk:** Minimal. Standard lint cleanup.
+### Step 2.1 — Convert to stateful component
+Change arrow function `const Navbar = () =>` to a proper function component with `useState`:
+```
+const [menuOpen, setMenuOpen] = useState(false);
+```
+
+### Step 2.2 — Wire hamburger
+`<button onClick={() => setMenuOpen(o => !o)}>` 
+
+### Step 2.3 — Conditional mobile menu
+Below the `<nav>` bar, render:
+```jsx
+{menuOpen && (
+  <div className="md:hidden bg-white border-b border-bento px-6 py-4 flex flex-col gap-4">
+    {['Benefits', 'Process', 'Gallery', 'Apply'].map(item => (
+      <a href={`#${item.toLowerCase()}`} onClick={() => setMenuOpen(false)} ...>{item}</a>
+    ))}
+  </div>
+)}
+```
 
 ---
 
-## Execution Order
+## Phase 3 — Egypt Localization (REQ-03)
 
-| Phase | Change | Dependency |
+**File:** `web2/finatelier/src/App.tsx` — `Collection` and `Hero` components
+
+### Step 3.1 — Replace USD prices
+In the `Collection` data array:
+- `"$45/mo"` → `"EGP 1,400/mo"`
+- `"$30/mo"` → `"EGP 925/mo"`  
+- `"$55/mo"` → `"EGP 1,700/mo"`
+
+### Step 3.2 — Update Hero subheadline
+Replace: `"The smarter way to pay for everything you love, split into 4 easy installments."`
+With: `"Split your purchase into 4 equal payments. No bank visit. No paperwork. Just your national ID."`
+
+### Step 3.3 — Footer copyright
+`© 2024 FinAtelier.` → `© 2025 FinAtelier Egypt.`
+
+---
+
+## Phase 4 — SEO + CSP Meta Tags (REQ-04 + REQ-06-D)
+
+**File:** `web2/finatelier/index.html`
+
+### Step 4.1 — Add title and meta description
+### Step 4.2 — Add Open Graph tags
+### Step 4.3 — Add Content-Security-Policy meta tag
+
+---
+
+## Phase 5 — Dependency Cleanup (REQ-05)
+
+**File:** `web2/finatelier/package.json`
+
+- Remove `@google/genai` entirely
+- Move `express` and `dotenv` to `devDependencies`
+- Run `npm install` to regenerate lockfile
+
+---
+
+## Execution Order & Ownership
+
+| Phase | Owner | Risk |
 |---|---|---|
-| 1 | Delete Testimonials | None |
-| 2 | Fix copy claims | None |
-| 3 | Replace images | None |
-| 4 | Footer cleanup | None |
-| 5 | Import cleanup | After 1, 3, 4 |
-
-Phases 1–4 are independent and can be parallelised by Jules and Antigravity. Phase 5 must run last.
+| 1 (Form + Security) | Jules | Medium — multiple state interactions |
+| 2 (Mobile Nav) | Jules | Low |
+| 3 (Localization) | Jules | Low — text only |
+| 4 (SEO + CSP) | Jules | Low — HTML only |
+| 5 (Dependencies) | Jules | Low |
