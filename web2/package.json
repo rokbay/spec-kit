@@ -1,0 +1,9 @@
+{
+  "name": "web2-workspace",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix finatelier",
+    "build": "npm run build --prefix finatelier",
+    "install:project": "npm install --prefix finatelier"
+  }
+}
